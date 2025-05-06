@@ -1,5 +1,6 @@
 #!/bin/bash
 # location should be: scripts/setup_user.sh
+# chmod +x scripts/setup_user.sh
 
 # Create non-root käyttäjä
 useradd -m -s /bin/zsh user
