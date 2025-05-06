@@ -1,4 +1,5 @@
 # Stage 1 Builder stage for dependencies
+# Toimiii 10h takana
 FROM ubuntu22.04 AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
