@@ -1,5 +1,5 @@
 #!/bin/bash
-# entrypoint.sh
+# docker/entrypoint.sh
 
 # Set up environment
 export HOME=/home/user
