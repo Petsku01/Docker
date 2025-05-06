@@ -1,5 +1,6 @@
 #!/bin/bash
 # location: scripts/example.sh
+# remember to chmod +x scripts/example.sh
 
 echo "Running example script as $(whoami)..."
 echo "Node version: $(node --version)"
