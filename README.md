@@ -55,4 +55,4 @@ cat data/output.txt
 
 See output.txt with content like:
 text
-Hello from Wed May 07 12:34:56 UTC 2025
+Hello from Wed JUN 01 12:34:56 UTC 2024
