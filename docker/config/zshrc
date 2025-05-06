@@ -1,0 +1,8 @@
+# config/zshrc
+# ei toimi
+
+export ZSH="/home/user/.oh-my-zsh"
+ZSH_THEME="agnoster"
+plugins=(git python node)
+source $ZSH/oh-my-zsh.sh
+alias ll='ls -la'
