@@ -1,5 +1,6 @@
 #!/bin/bash
 # loacation: scripts/help.sh
+# remember to make it executable chmod +x scripts/help.sh
 
 echo "Super Ubuntu Docker Container Usage:"
 echo "-----------------------------------"
