@@ -23,8 +23,8 @@
         <groupId>org.springframework.boot</groupId>
         <!-- Artifact ID of the parent POM -->
         <artifactId>spring-boot-starter-parent</artifactId>
-        <!-- Version of Spring Boot to use (3.2.5) -->
-        <version>3.2.5</version>
+        <!-- Version of Spring Boot to use (3.2.5) to (3.3.4) --> 
+        <version>3.3.4</version>
         <!-- Indicates no local parent POM; uses the one from the Maven repository -->
         <relativePath/>
     </parent>
