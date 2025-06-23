@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  crawler:
+    image: ml-web-crawler
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./output:/app/output
+    environment:
+      - START_URLS=https://www.example.com,https://github.com
+      - OUTPUT_FILE=/app/output/crawled_urls.csv
