@@ -1,6 +1,0 @@
-if (-not (Get-Command docker-compose -ErrorAction SilentlyContinue)) {
-    Write-Error "Docker Compose not found. Ensure Docker Desktop is installed."
-    exit 1
-}
-New-Item -ItemType Directory -Force -Path output
-docker-compose up
