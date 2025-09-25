@@ -1,7 +1,0 @@
-where docker-compose >nul 2>&1
-if %ERRORLEVEL% neq 0 (
-    echo Docker Compose not found. Ensure Docker Desktop is installed.
-    exit /b 1
-)
-mkdir output
-docker-compose up
