@@ -1,29 +1,22 @@
-# Use a slim Python 3.9 base image
-FROM python:3.9-slim
+FROM python:3.11-slim
 
-# Create non-root user
-RUN useradd -m appuser
-
-# Set working directory
 WORKDIR /app
 
-# Copy requirements file
+# Install dependencies first for better caching
 COPY requirements.txt .
-
-# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the crawler script
-COPY ml_web_crawler_fixed.py .
+# Copy application
+COPY ml_web_crawler.py .
 
-# Create output directory and set permissions
-RUN mkdir -p /app/output && chown appuser:appuser /app/output
+# Create output directory
+RUN mkdir -p /app/output && \
+    chmod 755 /app/output
 
-# Switch to non-root user
-USER appuser
+# Run as non-root
+RUN useradd -m -u 1000 crawler && \
+    chown -R crawler:crawler /app
 
-# Set environment variable for output
-ENV OUTPUT_FILE=/app/output/crawled_urls.csv
+USER crawler
 
-# Run the crawler
-CMD ["python", "ml_web_crawler_fixed.py"]
+CMD ["python", "-u", "ml_web_crawler.py"]
