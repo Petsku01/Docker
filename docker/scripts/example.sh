@@ -1,9 +1,17 @@
 #!/bin/bash
-# location: scripts/example.sh
-# remember to chmod +x scripts/example.sh
 
-echo "Running example script as $(whoami)..."
-echo "Node version: $(node --version)"
-echo "Python version: $(python3 --version)"
-echo "Saving output to /home/user/data/output.txt"
-echo "Hello from $(date)" > /home/user/data/output.txt
+echo "====================================="
+echo "Running example initialization script"
+echo "====================================="
+echo "User: $(whoami)"
+echo "Home: $HOME"
+echo "Shell: $SHELL"
+echo ""
+echo "Installed versions:"
+node --version 2>/dev/null && echo "Node: $(node --version)"
+python3 --version 2>/dev/null
+git --version 2>/dev/null
+echo ""
+echo "Creating test file in data directory..."
+echo "Initialized at $(date)" > /home/user/data/initialized.txt
+echo "Done! Check /home/user/data/initialized.txt"
