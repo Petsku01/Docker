@@ -8,5 +8,9 @@ services:
     volumes:
       - ./output:/app/output
     environment:
-      - START_URLS=https://www.example.com,https://github.com
+      - START_URLS=https://example.com,https://github.com
       - OUTPUT_FILE=/app/output/crawled_urls.csv
+      - MAX_URLS=50
+    restart: on-failure
+    mem_limit: 512m
+    cpus: '0.5'
