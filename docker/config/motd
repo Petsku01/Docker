@@ -1,10 +1,13 @@
-# config/motd
-Welcome to the Super Ubuntu Docker Container!
+========================================
+Welcome to Super Ubuntu Docker Container
+========================================
 
 Features:
-- Zsh with oh-my-zsh
-- Tools: git, python3, nodejs, awscli, jq, vim, htop
-- code-server (VS Code) on port 8080 (enable with ENABLE_CODE_SERVER=true)
-- SSH on port 22 (enable with ENABLE_SSH=true)
-- Persistent data: /home/user/data
-- Run 'help' for usage instructions
+• Zsh with oh-my-zsh
+• Tools: git, python3, nodejs, awscli, jq, vim, htop
+• Code-server (VS Code) on port 8080 (ENABLE_CODE_SERVER=true)
+• SSH on port 22 (ENABLE_SSH=true)
+• Persistent data: /home/user/data
+
+Run 'help' for usage instructions
+
