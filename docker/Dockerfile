@@ -1,88 +1,72 @@
-# Stage 1 Builder stage for dependencies
-# Toimiii 10h takana
-FROM ubuntu22.04 AS builder
+FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install build tools
-RUN apt-get update && apt-get install -y 
-    build-essential 
-    curl 
-    && apt-get clean 
-    && rm -rf varlibaptlists
+# Install all dependencies in one layer
+RUN apt-get update && apt-get install -y \
+    bash \
+    zsh \
+    curl \
+    wget \
+    nano \
+    vim \
+    git \
+    python3 \
+    python3-pip \
+    jq \
+    openssh-server \
+    sudo \
+    htop \
+    net-tools \
+    nodejs \
+    npm \
+    awscli \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install code-server (VS Code in browser)
-RUN curl -fsSL httpscode-server.devinstall.sh  sh
+# Install oh-my-zsh
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
-# Stage 2 Final image
-FROM ubuntu22.04
-
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Copy build artifacts
-COPY --from=builder usrbincode-server usrbincode-server
-COPY --from=builder usrlibcode-server usrlibcode-server
-
-# Install runtime dependencies
-RUN apt-get update && apt-get install -y 
-    bash 
-    zsh 
-    curl 
-    wget 
-    nano 
-    vim 
-    git 
-    python3 
-    python3-pip 
-    jq 
-    openssh-server 
-    sudo 
-    htop 
-    net-tools 
-    nodejs 
-    npm 
-    awscli 
-    && apt-get clean 
-    && rm -rf varlibaptlists
-
-# Install oh-my-zsh for enhanced shell
-RUN sh -c $(curl -fsSL httpsraw.githubusercontent.comohmyzshohmyzshmastertoolsinstall.sh)  --unattended
+# Install code-server
+RUN curl -fsSL https://code-server.dev/install.sh | sh
 
 # Set up SSH
-RUN mkdir varrunsshd
-COPY configsshd_config etcsshsshd_config
-RUN chmod 644 etcsshsshd_config
+RUN mkdir -p /var/run/sshd
 
-# Set up non-root user
-COPY scriptssetup_user.sh setup_user.sh
-RUN chmod +x setup_user.sh && setup_user.sh
+# Create non-root user
+RUN useradd -m -s /bin/zsh user && \
+    usermod -aG sudo user && \
+    echo "user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/user
 
-# Set up working directory and permissions
-WORKDIR homeuser
-RUN chown -R useruser homeuser
+# Set up working directory
+WORKDIR /home/user
 
 # Copy configuration files
-COPY configmotd etcmotd
-COPY configzshrc homeuser.zshrc
-RUN chown useruser homeuser.zshrc
+COPY config/sshd_config /etc/ssh/sshd_config
+COPY config/motd /etc/motd
+COPY config/zshrc /home/user/.zshrc
 
 # Copy scripts
-COPY scripts homeuserscripts
-RUN chmod +x homeuserscripts.sh && chown -R useruser homeuserscripts
+COPY scripts /home/user/scripts
+
+# Copy entrypoint
+COPY entrypoint.sh /entrypoint.sh
+
+# Set permissions
+RUN chmod 644 /etc/ssh/sshd_config && \
+    chmod 644 /etc/motd && \
+    chmod +x /entrypoint.sh && \
+    chmod +x /home/user/scripts/*.sh && \
+    chown -R user:user /home/user
 
 # Set up persistent volumes
-VOLUME homeuserdata
-VOLUME homeuser.ssh
+VOLUME ["/home/user/data", "/home/user/.ssh"]
 
 # Expose ports (SSH 22, code-server 8080, web 80)
 EXPOSE 22 8080 80
 
-# Copy and set entrypoint
-COPY entrypoint.sh entrypoint.sh
-RUN chmod +x entrypoint.sh
-
 # Entrypoint
-ENTRYPOINT [entrypoint.sh]
+ENTRYPOINT ["/entrypoint.sh"]
 
 # Default command
-CMD [binzsh]
+CMD ["/bin/zsh"]
