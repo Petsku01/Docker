@@ -1,49 +1,44 @@
 #!/bin/bash
+
 set -e
 
-# Set up environment
 export HOME=/home/user
 export SHELL=/bin/zsh
 
-# Welcome message
+# MOTD
 [ -f /etc/motd ] && cat /etc/motd
 
-# Ensure directories exist with correct permissions
+# Setup dirs
 mkdir -p /home/user/data /home/user/.ssh
 chown -R user:user /home/user/data /home/user/.ssh
 chmod 700 /home/user/.ssh
 
-# Start SSH server if enabled
+# Start SSH if enabled
 if [ "$ENABLE_SSH" = "true" ]; then
-    echo "Starting SSH server..."
-    /usr/sbin/sshd -D &
+  /usr/sbin/sshd -D &
 fi
 
 # Start code-server if enabled
 if [ "$ENABLE_CODE_SERVER" = "true" ]; then
-    echo "Starting code-server on port 8080..."
-    su - user -c "code-server --bind-addr 0.0.0.0:8080 --auth none /home/user/data" &
+  su - user -c "code-server --bind-addr 0.0.0.0:8080 --auth none --user-data-dir /home/user/data &"
 fi
 
-# Run initialization scripts
+# Run scripts
 if [ -d /home/user/scripts ]; then
-    for script in /home/user/scripts/*.sh; do
-        if [ -f "$script" ] && [ -x "$script" ]; then
-            echo "Running $(basename $script)..."
-            su - user -c "bash $script" || echo "Warning: $script failed"
-        fi
-    done
+  for script in /home/user/scripts/*.sh; do
+    [ -x "$script" ] && su - user -c "$script" || echo "Warning: $script failed"
+  done
 fi
 
-# Display help if requested
+# Help handling
 if [ "$1" = "help" ]; then
-    su - user -c "/home/user/scripts/help.sh"
-    exit 0
+  su - user -c "/home/user/scripts/help.sh"
+  exit 0
 fi
 
-# Execute provided command or start shell
+# Exec command or shell
 if [ $# -gt 0 ]; then
-    exec su - user -c "$*"
+  exec su - user -c "$*"
 else
-    exec su - user
+  exec su - user
 fi
