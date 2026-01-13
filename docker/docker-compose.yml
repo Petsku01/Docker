@@ -1,21 +1,25 @@
 version: '3.8'
-
 services:
   super-ubuntu:
-    build: .
+    build:
+      context: .
     image: super-ubuntu:latest
     container_name: super-ubuntu-dev
     hostname: super-ubuntu
     ports:
       - "2222:22"
       - "8080:8080"
-      - "8000:80"
     volumes:
       - ./data:/home/user/data
-      - ./ssh_keys:/home/user/.ssh
+      - ./ssh_keys:/home/user/.ssh:ro
     environment:
       - ENABLE_SSH=true
       - ENABLE_CODE_SERVER=true
     restart: unless-stopped
     stdin_open: true
     tty: true
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep sshd || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
