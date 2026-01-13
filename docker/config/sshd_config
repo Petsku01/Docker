@@ -1,8 +1,24 @@
 Port 22
 PermitRootLogin no
-PasswordAuthentication no
 PubkeyAuthentication yes
+PasswordAuthentication no  # Set to yes if needed for testing; use keys in production
 AuthorizedKeysFile .ssh/authorized_keys
 AllowUsers user
+
+# Hardening
+X11Forwarding no
+PermitEmptyPasswords no
+IgnoreRhosts yes
+HostbasedAuthentication no
+ChallengeResponseAuthentication no
+UsePAM yes
+
+# Logging and timeouts
+LogLevel INFO
 ClientAliveInterval 120
 ClientAliveCountMax 2
+
+# Secure ciphers (2026 recommendations) (not real)
+Ciphers aes256-gcm@openssh.com,chacha20-poly1305@openssh.com,aes256-ctr
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
+KexAlgorithms curve25519-sha256,curve448-sha512,diffie-hellman-group-exchange-sha256
