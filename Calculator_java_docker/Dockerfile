@@ -1,32 +1,38 @@
-# Stage 1: Build Stage
-# Use Maven 3.8.6 with OpenJDK 17 as the base image for building the Java application
-FROM maven:3.8.6-openjdk-17 AS builder
+# Stage 1: Build Stage (use Alpine for lighter builder)
+FROM maven:3.9.9-eclipse-temurin-17-alpine AS builder
 
-# Set the working directory inside the container to /app for all subsequent commands
+# Set working directory
 WORKDIR /app
 
-# Copy the Maven configuration file (pom.xml) from the local project to the /app directory
+# Copy pom.xml first for dependency caching
 COPY pom.xml .
 
-# Copy the source code directory (src) from the local project to /app/src in the container
-COPY src ./src
+# Download dependencies (cached if pom unchanged)
+RUN mvn dependency:go-offline -B
 
-# Run Maven to clean previous build artifacts, compile the code, and package it into a JAR file
-# The -DskipTests flag skips unit tests to speed up the build process
+# Copy source and build the layered JAR
+COPY src ./src
 RUN mvn clean package -DskipTests
 
-# Stage 2: Runtme Stage
-# Use OpenJDK 17 JRE slim image as the base image for running the application
-# The slim version includes only the Java Runtime Environment (JRE) to minimize image size
-FROM openjdk:17-jre-slim
+# Extract layers from the JAR
+RUN mkdir -p target/extracted && \
+    java -Djarmode=layertools -jar target/*.jar extract --destination target/extracted
 
-# Set the working directory inside the runtime container to /app
+# Stage 2: Runtime Stage (lightweight Alpine JRE)
+FROM eclipse-temurin:17-jre-alpine
+
+# Create non-root user for security
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser:appgroup
+
+# Set working directory
 WORKDIR /app
 
-# Copy the JAR file generated in the build stage from /app/target/ to /app/app.jar
-# The --from=builder flag references the builder stage defined above
-COPY --from=builder /app/target/complex-calculator-0.0.1-SNAPSHOT.jar app.jar
+# Copy extracted layers (dependencies first for caching)
+COPY --from=builder --chown=appuser:appgroup /app/target/extracted/dependencies/ ./
+COPY --from=builder --chown=appuser:appgroup /app/target/extracted/spring-boot-loader/ ./
+COPY --from=builder --chown=appuser:appgroup /app/target/extracted/snapshot-dependencies/ ./
+COPY --from=builder --chown=appuser:appgroup /app/target/extracted/application/ ./
 
-# Define the command to run the JAR file when the container starts
-# The exec form ["java", "-jar", "app.jar"] runs the command directly for better performance
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run with explicit launcher (faster than fat JAR)
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
