@@ -1,4 +1,7 @@
-pandas==2.1.4
-numpy==1.26.2
-scikit-learn==1.3.2
-scrapy==2.11.0
+beautifulsoup4==4.12.3
+requests==2.32.3
+selenium==4.24.0  # If used for dynamic pages
+scikit-learn==1.5.1  # For ML components
+numpy==2.0.1
+pandas==2.2.3
+torch==2.4.1  # If deep learning involved
