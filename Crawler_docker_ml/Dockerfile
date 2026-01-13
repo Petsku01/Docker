@@ -1,22 +1,22 @@
-FROM python:3.11-slim
+# Stage 1: Builder
+FROM python:3.12-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies first for better caching
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application
-COPY ml_web_crawler.py .
+COPY . .
 
-# Create output directory
-RUN mkdir -p /app/output && \
-    chmod 755 /app/output
+# Stage 2: Runtime
+FROM python:3.12-alpine
 
-# Run as non-root
-RUN useradd -m -u 1000 crawler && \
-    chown -R crawler:crawler /app
+WORKDIR /app
 
-USER crawler
+# Create non-root user
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
 
-CMD ["python", "-u", "ml_web_crawler.py"]
+COPY --from=builder /app /app
+
+ENTRYPOINT ["python", "ml_web_crawler_fixed.py"]
