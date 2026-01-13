@@ -16,6 +16,8 @@ A Dockerized web crawler that uses machine learning to identify and follow suspi
 
 ## Quick Start
 
+Build: docker build -t ml-crawler . | Run: docker run --env PROXY_URL=... ml-crawler
+
 ### Linux/Mac
 ```bash
 chmod +x activate-crawler.sh
