@@ -1,16 +1,16 @@
 version: '3.8'
 services:
   crawler:
-    image: ml-web-crawler
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
+    image: ml-crawler:latest
     volumes:
-      - ./output:/app/output
+      - ./data:/app/data
     environment:
-      - START_URLS=https://example.com,https://github.com
-      - OUTPUT_FILE=/app/output/crawled_urls.csv
-      - MAX_URLS=50
+      - PROXY_URL=http://proxy:8080
+      - RATE_LIMIT_SEC=5
+      - ML_MODEL_PATH=/app/models/model.pth
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests"]
+      interval: 30s
+      timeout: 10s
     restart: on-failure
-    mem_limit: 512m
-    cpus: '0.5'
