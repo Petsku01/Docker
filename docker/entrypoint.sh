@@ -12,6 +12,7 @@ export SHELL=/bin/zsh
 mkdir -p /home/user/data /home/user/.ssh
 chown -R user:user /home/user/data /home/user/.ssh
 chmod 700 /home/user/.ssh
+chmod 750 /home/user/data
 
 # Start SSH if enabled
 if [ "$ENABLE_SSH" = "true" ]; then
@@ -20,7 +21,7 @@ fi
 
 # Start code-server if enabled
 if [ "$ENABLE_CODE_SERVER" = "true" ]; then
-  su - user -c "code-server --bind-addr 0.0.0.0:8080 --auth none --user-data-dir /home/user/data &"
+  su - user -c "code-server --bind-addr 0.0.0.0:8080 --auth password --user-data-dir /home/user/data &"  
 fi
 
 # Run scripts
@@ -41,4 +42,3 @@ if [ $# -gt 0 ]; then
   exec su - user -c "$*"
 else
   exec su - user
-fi

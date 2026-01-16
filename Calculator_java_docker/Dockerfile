@@ -36,3 +36,9 @@ COPY --from=builder --chown=appuser:appgroup /app/target/extracted/application/ 
 
 # Run with explicit launcher (faster than fat JAR)
 ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
+
+# Health check to monitor application
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8080/actuator/health || exit 1
+
+EXPOSE 8080

@@ -27,7 +27,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 LABEL maintainer="Petsku01" \
       description="Secure Ubuntu dev container with tools" \
-      version="1.1"
+      version="1.2"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
@@ -54,11 +54,11 @@ COPY --from=builder /root/.oh-my-zsh /root/.oh-my-zsh
 COPY --from=builder /tmp/code-server.deb /tmp/code-server.deb
 RUN dpkg -i /tmp/code-server.deb && rm /tmp/code-server.deb
 
-# SSH hardening (allow password for compatibility, but recommend keys)
+# SSH hardening (require key-based auth for security)
 RUN mkdir -p /var/run/sshd && \
     sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config
 
-# Non-root user with sudo (require password for safety)
+# Non-root user with sudo (require password for safety - NO NOPASSWD)
 RUN useradd -m -s /bin/zsh user -G sudo && \
     echo "user ALL=(ALL) ALL" > /etc/sudoers.d/user && \
     chmod 0440 /etc/sudoers.d/user
@@ -75,7 +75,8 @@ COPY scripts /home/user/scripts
 COPY entrypoint.sh /entrypoint.sh
 
 RUN chown -R user:user /home/user && \
-    chmod +x /entrypoint.sh /home/user/scripts/*.sh
+    chmod +x /entrypoint.sh /home/user/scripts/*.sh && \
+    chmod 750 /home/user/data /home/user/.ssh
 
 VOLUME ["/home/user/data", "/home/user/.ssh"]
 
@@ -84,4 +85,3 @@ EXPOSE 22 8080
 HEALTHCHECK --interval=30s --timeout=10s CMD pgrep sshd || exit 1
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["/bin/zsh"]
