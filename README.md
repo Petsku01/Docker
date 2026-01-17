@@ -6,10 +6,10 @@ A collection of containerized applications demonstrating Docker best practices, 
 
 | Project | Type | Purpose | Status |
 |---------|------|---------|--------|
-| **Calculator_java_docker** | Java/Spring Boot | Complex number calculator (Spring Boot CLI app) | Production-ready |
-| **Crawler_docker_ml** | Python | Async web crawler with heuristic analysis | In development |
-| **Docker_test** | Python | Container orchestration test suite | Testing |
-| **docker/** | Multi-tool | Dev container with SSH, code-server, tools | Development |
+| **Calculator_java_docker** | Java 17 | Complex number calculator with CLI interface | Production-ready |
+| **async-web-crawler** | Python 3.12 | Async web crawler with content analysis | Production-ready |
+| **integration-tests** | Python 3.10 | Test environment for CI/CD integration | Production-ready |
+| **devops-container** | Ubuntu 24.04 | Dev container with SSH, code-server, tools | Production-ready |
 
 ## Quick Start
 
@@ -28,24 +28,36 @@ cp .env.example .env
 
 ### Run Individual Projects
 
-**Calculator**:
+**Complex Calculator**:
 ```bash
 cd Calculator_java_docker
-docker build -t calculator:latest .
-docker run -it calculator:latest
+docker build -t complex-calculator:latest .
+docker run -it --rm complex-calculator:latest
 ```
 
-This runs a Spring Boot CLI application (interactive terminal calculator).
-
-**Crawler**:
+**Async Web Crawler**:
 ```bash
-cd Crawler_docker_ml
-docker-compose up
+cd async-web-crawler
+docker build -t async-web-crawler:latest .
+docker run --rm async-web-crawler:latest --urls "https://example.com"
 ```
 
-**Full Stack**:
+**Integration Tests**:
 ```bash
-docker-compose -f docker/docker-compose.yml up
+cd integration-tests
+docker build -t integration-tests:latest .
+docker run --rm -v $(pwd):/app integration-tests:latest python3 /app/test_process.py
+```
+
+**DevOps Container**:
+Each container has detailed README documentation:
+- **[async-web-crawler/README.md](./async-web-crawler/README.md)** - Web crawler usage and configuration
+- **[Calculator_java_docker/README.md](./Calculator_java_docker/README.md)** - Complex calculator guide
+- **[integration-tests/README.md](./integration-tests/README.md)** - Test environment setup
+- **[devops-container/README.md](./devops-container/README.md)** - DevOps container guide
+- **[QUICKSTART.md](./QUICKSTART.md)** - Quick start guide for all projects
+- **[ADR.md](./ADR.md)** - Architecture Decision Records
+ssh devuser@localhost -p 2222
 ```
 
 ## Documentation
@@ -68,14 +80,14 @@ Implemented:
 - Docker image vulnerability scanning
 
 ## Testing
-
-### Unit Tests (Java Calculator)
-```bash
-cd Calculator_java_docker
-mvn clean test
+docker run --rm -v $(pwd):/app maven:3.9.9-eclipse-temurin-17 mvn -f /app/pom.xml clean test
 ```
 
 ### Code Quality
+```bash
+# Python linting (async-web-crawler)
+cd async-web-crawler
+docker run --rm -v $(pwd):/app python:3.12-slim bash -c "pip install flake8 pylint && flake8 /app/*.py && pylint /app/*.py"
 ```bash
 # Python linting
 flake8 Crawler_docker_ml/*.py
@@ -119,10 +131,10 @@ ML_MODEL_PATH=/app/models/model.pth
 - **Result**: 50-70% smaller images, faster startup
 
 ### Services
-- **Calculator**: Spring Boot CLI with CommandLineRunner (interactive terminal)
-- **Crawler**: Python async web scraper with heuristic content analysis
-- **Dev Container**: SSH + code-server + development tools
-- **Docker Test**: CI/CD test harness
+- **complex-calculator**: Java 17 CLI for complex number arithmetic operations
+- **async-web-crawler**: Python 3.12 async web scraper with URL validation and CSV export
+- **integration-tests**: Python 3.10 test environment for CI/CD pipelines
+- **devops-container**: Ubuntu 24.04 dev environment with SSH, code-server, and tools
 
 ## Customization
 
@@ -210,17 +222,17 @@ Before pushing, test locally:
 
 ```bash
 # Run CI/CD checks
-docker build -t calculator:test Calculator_java_docker/
-mvn test
+docker build -t complex-calculator:test Calculator_java_docker/
 
 # Run security scan
-trivy image calculator:test
+trivy image complex-calculator:test
 
 # Check for secrets
 git diff --cached | grep -i "password\|token\|secret"
 
 # Lint Python
-flake8 Crawler_docker_ml/
+cd async-web-crawler
+docker run --rm -v $(pwd):/app python:3.12-slim bash -c "pip install flake8 && flake8 /app/*.py"
 ```
 
 ## Security Reporting
@@ -247,8 +259,8 @@ Please include:
 ## Support
 
 - **Issues**: Open GitHub issue for bugs
-- **Questions**: See [DEPLOYMENT.md](./DEPLOYMENT.md)
-- **Security**: See [SECURITY_CHECKLIST.md](./SECURITY_CHECKLIST.md)
+- **Documentation**: See individual README files in each container directory
+- **Quick Start**: See [QUICKSTART.md](./QUICKSTART.md)
 - **Architecture**: See [ADR.md](./ADR.md)
 
 ---
